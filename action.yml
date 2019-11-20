@@ -1,0 +1,26 @@
+name: 'Landing Zone Prowler action'
+description: 'Performs a prowler scan on every created account managed by the LZ'
+inputs:
+  PROWLER_USER_ID:
+    description: 'The ID of the user'
+    required: true
+  PROWLER_ACCESS_KEY:
+    description: 'The IAM credentials for the user'
+    required: true
+  PROWLER_READ_ROLE: 
+    description: 'ARN of the role AWSLandingZoneSecurityReadOnlyRole in the security account'
+    required: true
+  PROWLER_LIST_ROLE:
+    description: 'ARN of the role AWSLandingZoneReadOnlyListAccountsRole in the primary account'
+    required: true
+outputs:
+  VALIDATION_RESULT:
+    description: 'The result of the validation'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.PROWLER_USER_ID }}
+    - ${{ inputs.PROWLER_ACCESS_KEY }}
+    - ${{ inputs.PROWLER_READ_ROLE }}
+    - ${{ inputs.PROWLER_LIST_ROLE }}
