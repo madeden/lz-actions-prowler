@@ -304,6 +304,41 @@ Then in the ReadOnlyExecutionRole IAM Role resource we state the principals in t
         - arn:aws:iam::aws:policy/ReadOnlyAccess
 ```
 
+parameters/aws_baseline/aws-landing-zone-security-roles.json
+```json
+[
+  {
+      "ParameterKey": "SecurityScannerUserArn",
+      "ParameterValue": "$[alfred_ssm_/org/member/security/scanner_user_arn]"
+  },
+  {
+      "ParameterKey": "EnableAdminRole",
+      "ParameterValue": "true"
+  },
+  {
+      "ParameterKey": "EnableReadOnlyRole",
+      "ParameterValue": "true"
+  },
+  {
+      "ParameterKey": "AdminRoleName",
+      "ParameterValue": "AWSLandingZoneAdminExecutionRole"
+  },
+  {
+      "ParameterKey": "ReadOnlyRoleName",
+      "ParameterValue": "AWSLandingZoneReadOnlyExecutionRole"
+  },
+  {
+      "ParameterKey": "SecurityAccountAdminRoleArn",
+      "ParameterValue": "$[alfred_ssm_/org/member/security/admin_role_arn]"
+  },
+  {
+      "ParameterKey": "SecurityAccountReadOnlyRoleArn",
+      "ParameterValue": "$[alfred_ssm_/org/member/security/readonly_role_arn]"
+  }
+]
+
+```
+
 ## 3.- Allowing role chainning
 
 Now we move back to the SecurityAccountReadOnlyRole we used in the first step. This Role is defined in the following template file templates/core_accounts/aws-landing-zone-security.template . Role chainning has to be defined in both directions, we already stated that SecurityAccountReadOnlyRole can be used to assume the AWSLandingZoneReadOnlyListAccountsRole now we have to specify the other direction, we have to modify the template:
