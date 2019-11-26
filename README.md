@@ -31,9 +31,9 @@ with:
   PROWLER_LIST_ROLE: ${{ secrets.PROWLER_LIST_ROLE }}
 ```
 
-The action uses the IAM credentials from a user in the security account to assume the AWSLandingZoneSecurityReadOnlyRole in the security account. After that it uses the obtained credentials to assume the AWSLandingZoneReadOnlyListAccountsRole, which in turns serves to assume the AWSLandingZoneReadOnlyListAccountsRole in the primary account, allowing the script to retrieve the list of available accounts. 
+The action uses the IAM credentials from a user in the security account to assume the AWSLandingZoneSecurityReadOnlyRole in the security account. After that it uses the obtained credentials to assume the AWSLandingZoneReadOnlyListAccountsRole, which in turns serves to retrieve the list of available accounts. 
 
-Then using the IAM user it assumes the AWSLandingZoneReadOnlyExecutionRole in every existing account to launch in parallel prowler for each account.
+Then using the IAM user credentials it assumes the AWSLandingZoneReadOnlyExecutionRole in every existing account to launch in parallel prowler for each account.
 
 # Required changes in the LZ for letting the action work
 
