@@ -33,7 +33,8 @@ assume_role(){
         aws sts get-caller-identity || abort "Unable to determine caller identity :("
   fi
 
-  local unix_timestamp=$(date +%s%N | cut -b1-13)
+  local unix_timestamp
+  unix_timestamp=$(date +%s%N | cut -b1-13)
 
   JSON_STS=$(aws sts assume-role --role-arn "$STS_ROLE"  --role-session-name "session-$unix_timestamp")
 
@@ -45,23 +46,25 @@ assume_role(){
   unset AWS_SECRET_ACCESS_KEY
   unset AWS_SESSION_TOKEN
 
-  export AWS_ACCESS_KEY_ID=$(echo $JSON_STS | jq -r .Credentials.AccessKeyId)
-  export AWS_SECRET_ACCESS_KEY=$(echo $JSON_STS | jq -r .Credentials.SecretAccessKey)
-  export AWS_SESSION_TOKEN=$(echo $JSON_STS | jq -r .Credentials.SessionToken)
+  export AWS_ACCESS_KEY_ID=$(echo "$JSON_STS" | jq -r .Credentials.AccessKeyId)
+  export AWS_SECRET_ACCESS_KEY=$(echo "$JSON_STS" | jq -r .Credentials.SecretAccessKey)
+  export AWS_SESSION_TOKEN=$(echo "$JSON_STS" | jq -r .Credentials.SessionToken)
 
   unset STS_ROLE
   unset JSON_STS
 }
 
 organizations_list_accounts(){
-  local ACCOUNTS=$(aws organizations list-accounts)
+  local ACCOUNTS
+  
+  ACCOUNTS=$(aws organizations list-accounts)
 
   if [ -z "$ACCOUNTS" ]; then
     abort "Unable to list accounts :("
   fi
 
-  echo $ACCOUNTS
-  ACCOUNTS_IDS=$(echo $ACCOUNTS | jq -r .Accounts | jq -r ".[] | .Id")
+  echo "$ACCOUNTS"
+  ACCOUNTS_IDS=$(echo "$ACCOUNTS" | jq -r .Accounts | jq -r ".[] | .Id")
 }
 
 check_input(){
@@ -103,8 +106,8 @@ SECOND_ROLE="$PROWLER_LIST_ROLE"
 
 # List accounts retrieving the ID and store them in ACCOUNTS_ID variable
 check_env
-assume_role $FIRST_ROLE
-assume_role $SECOND_ROLE
+assume_role "$FIRST_ROLE"
+assume_role "$SECOND_ROLE"
 organizations_list_accounts
 
 # Iterate over each ID launching prowler
