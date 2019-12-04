@@ -122,7 +122,8 @@ do
     export AWS_ACCESS_KEY_ID="$PROWLER_USER_ID"
     export AWS_SECRET_ACCESS_KEY="$PROWLER_ACCESS_KEY"
     export AWS_SESSION_TOKEN=""
-      
+    
+    assume_role "$FIRST_ROLE"
     assume_role "arn:aws:iam::$x:role/AWSLandingZoneReadOnlyExecutionRole"
     /prowler/prowler > "/tmp/prowler-$x" 2>&1 &
   fi
