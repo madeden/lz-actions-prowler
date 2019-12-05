@@ -7,7 +7,7 @@ inputs:
   PROWLER_ACCESS_KEY:
     description: 'The IAM credentials for the user'
     required: true
-  PROWLER_READ_ROLE: 
+  PROWLER_ROLE: 
     description: 'ARN of the role AWSLandingZoneSecurityReadOnlyRole in the security account'
     required: true
   PROWLER_LIST_ROLE:
@@ -22,5 +22,5 @@ runs:
   args:
     - ${{ inputs.PROWLER_USER_ID }}
     - ${{ inputs.PROWLER_ACCESS_KEY }}
-    - ${{ inputs.PROWLER_READ_ROLE }}
+    - ${{ inputs.PROWLER_ROLE }}
     - ${{ inputs.PROWLER_LIST_ROLE }}
