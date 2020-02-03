@@ -22,5 +22,6 @@ runs:
   args:
     - ${{ inputs.PROWLER_USER_ID }}
     - ${{ inputs.PROWLER_ACCESS_KEY }}
+    - ${{ inputs.PROWLER_USER_ROLE }}
     - ${{ inputs.PROWLER_ROLE }}
     - ${{ inputs.PROWLER_LIST_ROLE }}

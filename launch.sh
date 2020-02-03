@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DEBUG="true"
+DEBUG="false"
 
 abort(){
   echo "$1"
@@ -77,35 +77,42 @@ check_input(){
   fi
 
   if [ -z "$3" ]; then
-    abort "You must provide the AWSLandingZoneSecurityReadOnlyRole arn (From the security account)"
+    abort "You must provide the AWSLandingZoneSecurityScannerRole arn (From the security account)"
   fi
 
   if [ -z "$4" ]; then
+    abort "You must provide the AWSLandingZoneSecurityReadOnlyRole arn (From the security account)"
+  fi
+
+  if [ -z "$5" ]; then
     abort "You must provide the AWSLandingZoneReadOnlyListAccountsRole arn (From the primary account)"
   fi
 }
 
 #Validate input parameters
-if [ "$#" -ne 4 ]; then
+if [ "$#" -ne 5 ]; then
   abort "Invalid number of parameters :("
 fi
 
 PROWLER_USER_ID="$1"
 PROWLER_ACCESS_KEY="$2"
-PROWLER_READ_ROLE="$3"
-PROWLER_LIST_ROLE="$4"
+PROWLER_USER_ROLE="$3"
+PROWLER_READ_ROLE="$4"
+PROWLER_LIST_ROLE="$5"
 
-check_input "$PROWLER_USER_ID" "$PROWLER_ACCESS_KEY" "$PROWLER_READ_ROLE" "$PROWLER_LIST_ROLE"
+check_input "$PROWLER_USER_ID" "$PROWLER_ACCESS_KEY" "$PROWLER_USER_ROLE" "$PROWLER_READ_ROLE" "$PROWLER_LIST_ROLE"
 
 #Set internal variables from the parameters (which are also environment variables)
 export AWS_ACCESS_KEY_ID="$PROWLER_USER_ID"
 export AWS_SECRET_ACCESS_KEY="$PROWLER_ACCESS_KEY"
 export AWS_SESSION_TOKEN=""
+USER_ROLE="$PROWLER_USER_ROLE"
 FIRST_ROLE="$PROWLER_READ_ROLE"
 SECOND_ROLE="$PROWLER_LIST_ROLE"
 
 # List accounts retrieving the ID and store them in ACCOUNTS_ID variable
 check_env
+assume_role "$USER_ROLE"
 assume_role "$FIRST_ROLE"
 assume_role "$SECOND_ROLE"
 organizations_list_accounts
@@ -114,19 +121,14 @@ organizations_list_accounts
 for x in $ACCOUNTS_IDS
 do
   echo "scanning account with id $x..."
-  if [ "$x" == "473614850072" ]; then
-    echo "Skipping account..."
-  elif [ "$x" == "098920174900" ]; then
-    echo "Skipping account..."
-  else
-    export AWS_ACCESS_KEY_ID="$PROWLER_USER_ID"
-    export AWS_SECRET_ACCESS_KEY="$PROWLER_ACCESS_KEY"
-    export AWS_SESSION_TOKEN=""
-    
-    assume_role "$FIRST_ROLE"
-    assume_role "arn:aws:iam::$x:role/AWSLandingZoneReadOnlyExecutionRole"
-    /prowler/prowler > "/tmp/prowler-$x" 2>&1 &
-  fi
+  export AWS_ACCESS_KEY_ID="$PROWLER_USER_ID"
+  export AWS_SECRET_ACCESS_KEY="$PROWLER_ACCESS_KEY"
+  export AWS_SESSION_TOKEN=""
+  
+  assume_role "$USER_ROLE"
+  assume_role "$FIRST_ROLE"
+  assume_role "arn:aws:iam::$x:role/AWSLandingZoneReadOnlyExecutionRole"
+  /prowler/prowler > "/tmp/prowler-$x" 2>&1 &
 done
 
 echo "Waiting for processes to end... results will be printed later, be patient, have a tea/coffee :)"
