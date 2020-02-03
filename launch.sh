@@ -16,13 +16,13 @@ check_env(){
   echo "Checking environment"
   CHECK_EXECS="aws jq"
   for x in $CHECK_EXECS
-  do  
+  do
     check_exec "$x" || abort "Unable to find $x"
   done
 }
 
 assume_role(){
-  local STS_ROLE="$1"      
+  local STS_ROLE="$1"
   local JSON_STS=""
 
   if [ -z "$STS_ROLE" ]; then
@@ -40,15 +40,19 @@ assume_role(){
 
   if [ -z "$JSON_STS" ]; then
     abort "Unable to assume role :("
-  fi        
+  fi
 
   unset AWS_ACCESS_KEY_ID
   unset AWS_SECRET_ACCESS_KEY
   unset AWS_SESSION_TOKEN
 
-  export AWS_ACCESS_KEY_ID=$(echo "$JSON_STS" | jq -r .Credentials.AccessKeyId)
-  export AWS_SECRET_ACCESS_KEY=$(echo "$JSON_STS" | jq -r .Credentials.SecretAccessKey)
-  export AWS_SESSION_TOKEN=$(echo "$JSON_STS" | jq -r .Credentials.SessionToken)
+  AWS_ACCESS_KEY_ID=$(echo "$JSON_STS" | jq -r .Credentials.AccessKeyId)
+  AWS_SECRET_ACCESS_KEY=$(echo "$JSON_STS" | jq -r .Credentials.SecretAccessKey)
+  AWS_SESSION_TOKEN=$(echo "$JSON_STS" | jq -r .Credentials.SessionToken)
+
+  export AWS_ACCESS_KEY_ID
+  export AWS_SECRET_ACCESS_KEY
+  export AWS_SESSION_TOKEN
 
   unset STS_ROLE
   unset JSON_STS
@@ -56,7 +60,7 @@ assume_role(){
 
 organizations_list_accounts(){
   local ACCOUNTS
-  
+
   ACCOUNTS=$(aws organizations list-accounts)
 
   if [ -z "$ACCOUNTS" ]; then
@@ -103,9 +107,14 @@ PROWLER_LIST_ROLE="$5"
 check_input "$PROWLER_USER_ID" "$PROWLER_ACCESS_KEY" "$PROWLER_USER_ROLE" "$PROWLER_READ_ROLE" "$PROWLER_LIST_ROLE"
 
 #Set internal variables from the parameters (which are also environment variables)
-export AWS_ACCESS_KEY_ID="$PROWLER_USER_ID"
-export AWS_SECRET_ACCESS_KEY="$PROWLER_ACCESS_KEY"
-export AWS_SESSION_TOKEN=""
+AWS_ACCESS_KEY_ID="$(PROWLER_USER_ID)"
+AWS_SECRET_ACCESS_KEY="$(PROWLER_ACCESS_KEY)"
+AWS_SESSION_TOKEN=""
+
+export AWS_ACCESS_KEY_ID
+export AWS_SECRET_ACCESS_KEY
+export AWS_SESSION_TOKEN
+
 USER_ROLE="$PROWLER_USER_ROLE"
 FIRST_ROLE="$PROWLER_READ_ROLE"
 SECOND_ROLE="$PROWLER_LIST_ROLE"
@@ -121,10 +130,14 @@ organizations_list_accounts
 for x in $ACCOUNTS_IDS
 do
   echo "scanning account with id $x..."
-  export AWS_ACCESS_KEY_ID="$PROWLER_USER_ID"
-  export AWS_SECRET_ACCESS_KEY="$PROWLER_ACCESS_KEY"
-  export AWS_SESSION_TOKEN=""
-  
+  AWS_ACCESS_KEY_ID="$(PROWLER_USER_ID)"
+  AWS_SECRET_ACCESS_KEY="$(PROWLER_ACCESS_KEY)"
+  AWS_SESSION_TOKEN=""
+
+  export AWS_ACCESS_KEY_ID
+  export AWS_SECRET_ACCESS_KEY
+  export AWS_SESSION_TOKEN
+
   assume_role "$USER_ROLE"
   assume_role "$FIRST_ROLE"
   assume_role "arn:aws:iam::$x:role/AWSLandingZoneReadOnlyExecutionRole"
