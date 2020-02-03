@@ -36,7 +36,7 @@ with:
   PROWLER_LIST_ROLE: ${{ secrets.PROWLER_LIST_ROLE }}
 ```
 
-The action uses the IAM credentials from an special user in the security account to assume the AWSLandingZoneProwlerScanRole in the security account. After that it uses the obtained credentials to assume the AWSLandingZoneReadOnlyListAccountsRole in the primary account, which in turns serves to retrieve the list of available accounts. 
+The action uses the IAM credentials from an special user in the security account to assume the AWSLandingZoneProwlerScanRole in the security account. After that it uses the obtained credentials to assume the AWSLandingZoneReadOnlyListAccountsRole in the primary account, which in turns serves to retrieve the list of available accounts.
 
 Then using the IAM user credentials it assumes the AWSLandingZoneProwlerScanRole in the security account and then AWSLandingZoneReadOnlyExecutionRole in every existing account to launch in parallel prowler for each account.
 
@@ -263,4 +263,5 @@ and the changes in the manifest file:
                 value: $[output_CrossAccountSecurityScannerRoleName]
           ...
 ```
+
 Now that everything is in place, the action can be used against your LZ.

@@ -16,13 +16,13 @@ check_env(){
   echo "Checking environment"
   CHECK_EXECS="aws jq"
   for x in $CHECK_EXECS
-  do  
+  do
     check_exec "$x" || abort "Unable to find $x"
   done
 }
 
 assume_role(){
-  local STS_ROLE="$1"      
+  local STS_ROLE="$1"
   local JSON_STS=""
 
   if [ -z "$STS_ROLE" ]; then
@@ -40,7 +40,7 @@ assume_role(){
 
   if [ -z "$JSON_STS" ]; then
     abort "Unable to assume role :("
-  fi        
+  fi
 
   unset AWS_ACCESS_KEY_ID
   unset AWS_SECRET_ACCESS_KEY
@@ -56,7 +56,7 @@ assume_role(){
 
 organizations_list_accounts(){
   local ACCOUNTS
-  
+
   ACCOUNTS=$(aws organizations list-accounts)
 
   if [ -z "$ACCOUNTS" ]; then
@@ -106,6 +106,7 @@ check_input "$PROWLER_USER_ID" "$PROWLER_ACCESS_KEY" "$PROWLER_USER_ROLE" "$PROW
 export AWS_ACCESS_KEY_ID="$PROWLER_USER_ID"
 export AWS_SECRET_ACCESS_KEY="$PROWLER_ACCESS_KEY"
 export AWS_SESSION_TOKEN=""
+
 USER_ROLE="$PROWLER_USER_ROLE"
 FIRST_ROLE="$PROWLER_READ_ROLE"
 SECOND_ROLE="$PROWLER_LIST_ROLE"
@@ -124,7 +125,7 @@ do
   export AWS_ACCESS_KEY_ID="$PROWLER_USER_ID"
   export AWS_SECRET_ACCESS_KEY="$PROWLER_ACCESS_KEY"
   export AWS_SESSION_TOKEN=""
-  
+
   assume_role "$USER_ROLE"
   assume_role "$FIRST_ROLE"
   assume_role "arn:aws:iam::$x:role/AWSLandingZoneReadOnlyExecutionRole"

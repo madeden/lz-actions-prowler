@@ -7,7 +7,7 @@ inputs:
   PROWLER_ACCESS_KEY:
     description: 'The IAM credentials for the user'
     required: true
-  PROWLER_ROLE: 
+  PROWLER_ROLE:
     description: 'ARN of the role AWSLandingZoneSecurityReadOnlyRole in the security account'
     required: true
   PROWLER_LIST_ROLE:
